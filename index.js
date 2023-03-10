@@ -1,11 +1,18 @@
 const express=require('express')
 const mongoose=require('mongoose')
+const jwt=require("jsonwebtoken")
+const secreteKey="secreteKey"
+
+
 var cors = require('cors')
 
 const app=express()
 var bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(cors())
+
+
+
 mongoose.connect("mongodb+srv://vishal:vishal@cluster0.ngbzanr.mongodb.net/?retryWrites=true&w=majority",{
     useNewUrlParser:true,
     useUnifiedTopology:true,
@@ -26,7 +33,8 @@ const sch={
     password:String
 }
 
-const monmodel=mongoose.model('users',sch)
+//bellow we define collections allinoneusers database name test
+const monmodel=mongoose.model('allinoneusers',sch)
 
 
 app.post("/post",async(req,res)=>{
@@ -37,9 +45,58 @@ app.post("/post",async(req,res)=>{
     })
 
     const val=await data.save()
-    res.json(val)
+    //bellow line we commented because we only have token that user crete when user get login
+    // res.json(val)
+
+    console.log("get res of post request",val);
+
+    //when we get repose we send that response in jwt token
+    //this token expire in 5 min that is 300 sec 
+    jwt.sign({val},secreteKey,{expiresIn:'300s'},(err,token)=>{
+        res.json({
+            token
+        })
+        // console.log("get token in console",token)
+    })
+
 
 })
+
+app.post("/profile",verifyToken,(req,res)=>{
+    //in jwt.verify here we check genrated token add get token are same or not , if same then we get that user creaditional
+    // console.log("profil req token",req.token);
+    jwt.verify(req.token,secreteKey,(err,authdata)=>{
+        if(err){
+            res.send({
+                result:"Invalid Token, Token expire"
+            })
+        }else{
+            res.json({
+                message:"profile access",
+                authdata
+            })
+        }
+    })
+})
+
+
+//here we pass req of token that get by post request of login 
+function verifyToken(req,res,next){
+    //here we get token we pass in body 
+    const bearerbody=req.body.authentication
+    // console.log("get rew body",bearerbody);
+    if(typeof bearerbody !== 'undefined'){
+        const bearer=bearerbody
+        const token= bearer
+        req.token=token;
+        next()
+    }else{
+        res.send({
+            result:'Token is not valid'
+        })
+    }
+}
+
 
 app.get("/get",async(req,res)=>{
    monmodel.find({},(err,data)=>{
