@@ -30,7 +30,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const sch={
     email:String,
-    password:String
+    password:String,
+    status:String
 }
 
 //bellow we define collections allinoneusers database name test
@@ -41,7 +42,8 @@ app.post("/post",async(req,res)=>{
     console.log("inside the post function",req.body);
     const data=new monmodel({
         email:req.body.email,
-        password:req.body.password
+        password:req.body.password,
+        status:req.body.status
     })
 
     const val=await data.save()
