@@ -113,7 +113,7 @@ app.get("/get",async(req,res)=>{
 
 
 //get existing email
-app.post("/get/:email",async(req,res)=>{
+app.get("/get/:email",async(req,res)=>{
     let userEmail=req.params.email
     console.log("get email in console",userEmail);
     monmodel.find({email:userEmail},(err,data)=>{
