@@ -46,20 +46,15 @@ app.post("/post",async(req,res)=>{
         status:req.body.status
     })
 
+  
+
     const val=await data.save()
     //bellow line we commented because we only have token that user crete when user get login
-    // res.json(val)
+    res.json(val)
 
     console.log("get res of post request",val);
 
-    //when we get repose we send that response in jwt token
-    //this token expire in 5 min that is 300 sec 
-    jwt.sign({val},secreteKey,{expiresIn:'300s'},(err,token)=>{
-        res.json({
-            token
-        })
-        // console.log("get token in console",token)
-    })
+    
 
 
 })
@@ -137,8 +132,19 @@ app.get("/get/:email",async(req,res)=>{
      if(data==null){
          res.send("nothing found")
      }else{
-         res.send(data)
+
+         //here we find user that 
+         const var2=data
          console.log("user auth found api res",data);
+
+         //when we get repose we send that response in jwt token
+         //this token expire in 5 min that is 300 sec 
+         jwt.sign({var2},secreteKey,{expiresIn:'300s'},(err,token)=>{
+         res.json({
+            token
+        })
+        console.log("get token in console",token)
+       })
      }
     })
  })
