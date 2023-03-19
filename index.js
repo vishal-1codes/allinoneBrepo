@@ -37,6 +37,14 @@ const sch={
 //bellow we define collections allinoneusers database name test
 const monmodel=mongoose.model('allinoneusers',sch)
 
+const crud={
+    name:String,
+    number:Number,
+    sport:String
+}
+
+const crudmodel=mongoose.model('crudusers',crud)
+
 
 app.post("/post",async(req,res)=>{
     console.log("inside the post function",req.body);
@@ -46,16 +54,11 @@ app.post("/post",async(req,res)=>{
         status:req.body.status
     })
 
-  
-
     const val=await data.save()
     //bellow line we commented because we only have token that user crete when user get login
     res.json(val)
 
     console.log("get res of post request",val);
-
-    
-
 
 })
 
@@ -189,6 +192,80 @@ app.post("/delete/:id",async(req,res)=>{
     })
 })
 
+
+
+
+
+//crud users
+app.post("/crudpost",async(req,res)=>{
+    console.log("get crud req body",req.body);
+    const data=new crudmodel({
+        name:req.body.name,
+        number:req.body.number,
+        sport:req.body.sport
+    })
+
+    const val2=await data.save()
+    //bellow line we commented because we only have token that user crete when user get login
+    res.json(val2)
+})
+
+
+
+app.get("/crudget",async(req,res)=>{
+    crudmodel.find({},(err,data)=>{
+     if(data==null){
+         res.send("nothing found")
+     }else{
+         res.send(data)
+         console.log("get crud api res");
+     }
+    })
+ })
+ 
+
+ app.get("/crudget/:id",async(req,res)=>{
+    let userid=req.params.id
+    console.log("get id in console",userid);
+    crudmodel.find({_id:userid},(err,data)=>{
+     if(data==null){
+         res.send("nothing found")
+     }else{
+         res.send(data)
+         console.log("get id api res",data);
+     }
+    })
+ })
+
+
+ app.put("/crudupdate/:id",async(req,res)=>{
+    let userId=req.params.id;
+    let nameV=req.body.name;
+    let numberV=req.body.number;
+    let sportV=req.body.sport;
+
+    crudmodel.findByIdAndUpdate({_id:userId},{$set:{name:nameV,number:numberV,sport:sportV}},{new:true},(err,data)=>{
+        if(data==null){
+            res.send("nothing found")
+        }else{
+            res.send(data)
+            console.log("display crud updated data",data);
+        }
+    })
+})
+
+
+app.get("/cruddelete/:id",async(req,res)=>{
+    let userId=req.params.id;
+    crudmodel.findByIdAndDelete({_id:userId},(err,data)=>{
+        if(data==null){
+            res.send("nothing found")
+        }else{
+            res.send(data)
+            console.log("display deleted data",data);
+        }
+    })
+})
 
 
 app.listen(3000,()=>{
